@@ -1,0 +1,102 @@
+#!/bin/bash
+#FAZER O READ DEPOIS
+echo -n "Digite o código "
+read CODIGO
+echo -n "Digite o consumo em Kvh "
+read CONSUMO 
+echo -n "Digite o custo do Kvh "
+read CUSTO
+
+#SEPARA OS NUMERO REAIS EM 2 TERMOS ATES E DEPOIS DO PONTO
+DIVINDINDO(){
+	PARTE1=$(echo "$1" | cut -d'.' -f1)
+	PARTE2=$(echo "$1" | cut -d'.' -f2)
+	echo "$PARTE1"
+	echo "$PARTE2"
+}
+
+if [[ ! "$CONSUMO" == *"."* ]];
+then
+	CONSUMO="$CONSUMO.00"
+fi
+
+if [[ ! "$CUSTO" == *"."* ]];
+then
+	CUSTO="$CUSTO.00"
+fi
+#CRIA O ARRAY DO RETORNO DO DIVIDINDO DO CONSUMO
+mapfile -t SPLITCONSUMO < <(DIVINDINDO $CONSUMO)
+#CRIA O ARRAY DO RETORNO DO DIVIDINDO DO CUSTO
+mapfile -t SPLITCUSTO < <(DIVINDINDO $CUSTO ) 
+echo "${SPLITCONSUMO[0]}${SPLITCONSUMO[1]}"
+echo "${SPLITCUSTO[0]}${SPLITCUSTO[1]}"
+#CALCULA O CUSTO TOTAL DA CONTA SEM O PONTO
+VALORTOTAL=$(("${SPLITCONSUMO[0]}${SPLITCONSUMO[1]}"*"${SPLITCUSTO[0]}${SPLITCUSTO[1]}"))
+#DESCOBRE AONDE O PONTO DEVE FICAR
+VIRGULA=$((${#VALORTOTAL}-${#SPLITCONSUMO[1]}-${#SPLITCUSTO[1]}))
+#QUEBRA A STRING DOIS PONTOS DEPOIS DA VIRGULA PARA FACILITAR
+FIM=$(($VIGULA+2))
+#COLOCA O PONTO NO LUGAR
+VALORFINAL="${VALORTOTAL:0:$VIRGULA}.${VALORTOTAL:$VIRGULA:$FIM}"
+
+#CRIA O ARRAY DO RETORNO DO DIVIDINDO DO VALOR FINAL
+mapfile -t SPLITFINAL < <(DIVINDINDO $VALORFINAL ) 
+
+#VARIFICA SE O CUSTO FINAL E MENOR QUE 11 REAIS
+if [ ${SPLITFINAL[0]} -lt 11 ]
+then
+	echo "Código $CODIGO"
+	echo "TEM QUE PAGAR O MINIMO R$ 11.20"
+	#PARA EXECUÇÃO
+	exit
+fi
+
+
+#VERIFICA SE O CUSTO É IGUAL A 11 REAIS E MENOR QUE 20 CENTAVOS
+if [ ${SPLITFINAL[0]} -eq 11 ]  && [ ${SPLITFINAL[1]} -lt 20 ]
+then
+	echo "Código $CODIGO"
+	echo "TEM QUE PAGAR O MINIMO DE 11.20"
+	#PARA EXECUÇÃO
+	exit
+fi
+
+echo "Código $CODIGO"
+echo "TEM QUE PAGAR O TOTAL DE $VALORFINAL"
+#PARA EXECUÇÃO
+exit
+
+#TAMANHO=${#SPLITCONSUMO[]} 
+
+#if [ ${RESPOSTA[0]} -lt 11 ]
+#then
+#	echo "TEM QUE PAGAR O MINIMO R$ 11.20"
+#	exit
+#fi
+
+
+
+#if [ ${RESPOSTA[1]} -lt 20]
+#then
+#	echo "TEM QUE PAGAR O MINIMO DE 11.20"
+#	exit
+#fi
+
+#echo "TEM QUE PAGAR O TOTAL DE $VALORFINAL"
+
+
+
+
+#SALVANDO
+
+#IFG="." read -r -a MEUARRAY <<< "$STRING"
+#echo "$STRING"
+#echo "${MEUARRAY[0]}"
+
+
+
+#if [ ${RESPOSTA[0]} -gt 10]
+#then
+#	echo "TEM QUE PAGAR O TOTAL DE "
+#	exit
+#fi
